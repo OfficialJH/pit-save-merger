@@ -1,0 +1,125 @@
+// Constants mapping out the exact byte boundaries we found
+const FILE_SIZE = 8192;
+
+// Slot boundaries mapping
+const SECTORS = {
+    header: { start: 0, end: 11 },       // 11 bytes
+    slot1_P: { start: 11, end: 2056 },   // 2045 bytes
+    slot2_P: { start: 2056, end: 4080 }, // 2024 bytes
+    slot1_B: { start: 4080, end: 6104 }, // 2024 bytes
+    slot2_B: { start: 6104, end: 8192 }  // 2088 bytes
+};
+
+let file1Data = null;
+let file2Data = null;
+let dsvFooter = null; // To store DeSmuME footer if uploaded file is a .dsv
+
+// File Reader Helper
+function readFile(fileInput) {
+    return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) {
+            resolve(null);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(new Uint8Array(e.target.result));
+        reader.onerror = (e) => reject("Error reading file.");
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+// Display Status Message
+function showStatus(message, isError = false) {
+    const statusDiv = document.getElementById('status');
+    statusDiv.style.display = 'block';
+    statusDiv.textContent = message;
+    statusDiv.className = isError ? 'error' : 'success';
+}
+
+// Trigger File Download
+function downloadFile(dataArray, filename) {
+    const blob = new Blob([dataArray], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Main Merge Logic
+document.getElementById('merge-btn').addEventListener('click', async () => {
+    const file1Input = document.getElementById('file1');
+    const file2Input = document.getElementById('file2');
+
+    if (!file1Input.files[0] || !file2Input.files[0]) {
+        showStatus("Please upload both File 1 and File 2 before merging.", true);
+        return;
+    }
+
+    try {
+        file1Data = await readFile(file1Input);
+        file2Data = await readFile(file2Input);
+
+        // Validate sizes
+        if (file1Data.length < FILE_SIZE || file2Data.length < FILE_SIZE) {
+            showStatus("Error: One or both files are too small to be valid PiT saves.", true);
+            return;
+        }
+
+        // Capture .dsv footer if it exists (usually 122 bytes added by DeSmuME)
+        if (file1Data.length > FILE_SIZE) {
+            dsvFooter = file1Data.subarray(FILE_SIZE);
+        } else if (file2Data.length > FILE_SIZE) {
+            dsvFooter = file2Data.subarray(FILE_SIZE);
+        }
+
+        // Prepare merged array (standard 8KB)
+        const mergedData = new Uint8Array(FILE_SIZE);
+        
+        // Keep File 1's header as the master global header
+        mergedData.set(file1Data.subarray(SECTORS.header.start, SECTORS.header.end), SECTORS.header.start);
+
+        // Process Slot 1 (Primary & Backup)
+        const slot1Choice = document.getElementById('slot1-source').value;
+        const source1 = slot1Choice === "1" ? file1Data : file2Data;
+        mergedData.set(source1.subarray(SECTORS.slot1_P.start, SECTORS.slot1_P.end), SECTORS.slot1_P.start);
+        mergedData.set(source1.subarray(SECTORS.slot1_B.start, SECTORS.slot1_B.end), SECTORS.slot1_B.start);
+
+        // Process Slot 2 (Primary & Backup)
+        const slot2Choice = document.getElementById('slot2-source').value;
+        const source2 = slot2Choice === "1" ? file1Data : file2Data;
+        mergedData.set(source2.subarray(SECTORS.slot2_P.start, SECTORS.slot2_P.end), SECTORS.slot2_P.start);
+        mergedData.set(source2.subarray(SECTORS.slot2_B.start, SECTORS.slot2_B.end), SECTORS.slot2_B.start);
+
+        // Handle Export Formatting
+        const exportFormat = document.getElementById('export-format').value;
+        let finalOutput;
+
+        if (exportFormat === 'dsv') {
+            if (dsvFooter) {
+                // Stitch the 8KB save and the DeSmuME footer together
+                finalOutput = new Uint8Array(FILE_SIZE + dsvFooter.length);
+                finalOutput.set(mergedData, 0);
+                finalOutput.set(dsvFooter, FILE_SIZE);
+            } else {
+                // If no footer was found in uploads, just export raw data as .dsv (emulators usually accept this)
+                finalOutput = mergedData; 
+            }
+            downloadFile(finalOutput, "PiT_Merged.dsv");
+        } else {
+            // Export raw .sav
+            finalOutput = mergedData;
+            downloadFile(finalOutput, "PiT_Merged.sav");
+        }
+
+        showStatus("Files successfully merged and downloaded!");
+
+    } catch (error) {
+        showStatus(error, true);
+        console.error(error);
+    }
+});

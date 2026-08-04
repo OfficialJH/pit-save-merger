@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partners in Time Save Merger</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Partners in Time Save Merger</h2>
+        <h4>Created by OfficialJH</h4>
+
+        <!-- File 1 Input -->
+        <div class="file-section">
+            <h3>Save File 1</h3>
+            <input type="file" id="file1" accept=".sav,.dsv">
+        </div>
+
+        <!-- File 2 Input -->
+        <div class="file-section">
+            <h3>Save File 2</h3>
+            <input type="file" id="file2" accept=".sav,.dsv">
+        </div>
+
+        <!-- Merge Settings -->
+        <div class="file-section">
+            <h3>Merge Settings</h3>
+
+            <label for="slot1-source">Data to use for Slot 1:</label>
+            <select id="slot1-source">
+                <option value="1">Keep Slot 1 from File 1</option>
+                <option value="2">Keep Slot 1 from File 2</option>
+            </select>
+
+            <label for="slot2-source">Data to use for Slot 2:</label>
+            <select id="slot2-source">
+                <option value="1">Keep Slot 2 from File 1</option>
+                <option value="2" selected>Keep Slot 2 from File 2</option>
+            </select>
+
+            <label for="export-format">Export Format:</label>
+            <select id="export-format">
+                <option value="sav">.sav (Raw EEPROM)</option>
+                <option value="dsv">.dsv (DeSmuME Format)</option>
+            </select>
+        </div>
+
+        <button class="merge-btn" id="merge-btn">Merge & Download</button>
+        <div id="status"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
