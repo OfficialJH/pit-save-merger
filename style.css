@@ -1,17 +1,17 @@
 :root {
-    --primary: #e52521;
-    --secondary: #43b047;
     --bg: #eee;
-    --panel: #f4f4f4;
     --text: #000;
+    --panel: #f4f4f4;
     --border: #ccc;
+    --merge-btn: #ff5555;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --text: #fff;
         --bg: #222;
+        --text: #fff;
         --panel: #333;
+        --border: #aaa;
     }
 }
 
@@ -20,18 +20,14 @@ body {
     background-color: var(--bg);
     color: var(--text);
     margin: 0;
-    padding: 40px 20px;
+    padding: 32px;
     display: flex;
     justify-content: center;
 }
 
 .container {
-    background: var(--panel);
-    max-width: 600px;
+    max-width: 500px;
     width: 100%;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 h2, h4 {
@@ -41,40 +37,42 @@ h2, h4 {
 }
 
 .file-section {
-    border: 2px dashed var(--border);
-    padding: 15px;
+    padding: 16px;
     border-radius: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     background: var(--panel);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1)
 }
 
 .file-section h3 {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-size: 1.1em;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     font-weight: bold;
     font-size: 0.9em;
 }
 
 input[type="file"], select {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
+    padding: 8px;
+    margin-bottom: 12px;
     border: 1px solid var(--border);
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
+    background: inherit;
+    color: inherit;
 }
 
 .merge-btn {
-    background-color: var(--primary);
+    background-color: var(--merge-btn);
     color: white;
     border: none;
-    padding: 15px;
+    padding: 12px;
     width: 100%;
     font-size: 1.1em;
     font-weight: bold;
@@ -83,14 +81,10 @@ input[type="file"], select {
     transition: background 0.3s;
 }
 
-.merge-btn:hover {
-    background-color: #c41e1b;
-}
-
 #status {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 5px;
+    margin-top: 16px;
+    padding: 8px;
+    border-radius: 8px;
     text-align: center;
     font-weight: bold;
     display: none;
