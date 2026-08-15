@@ -1,58 +1,96 @@
 :root {
-    --bg: #eee;
     --text: #000;
+    --bg: #eee;
     --panel: #f4f4f4;
     --border: #ccc;
-    --merge-btn: #ff5555;
+    --btn: #fff;
+    --accent: #ff5555;
+    --hover: #ffaaaa;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg: #222;
         --text: #fff;
+        --bg: #222;
         --panel: #333;
         --border: #aaa;
+        --btn: #444;
     }
 }
 
-body {
+* {
+    box-sizing: border-box;
     font-family: "Courier New", Courier, monospace;
+}
+
+body {
     background-color: var(--bg);
     color: var(--text);
-    margin: 0;
-    padding: 32px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover { color: var(--hover) }
+
+header {
+    display: flex;
+    justify-content: right;
+    width: 100%;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+button {
+    background: var(--btn);
+    color: var(--text);
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+    font-size: 1.1em;
+    cursor: pointer;
 }
 
 .container {
+    display: flex;
+    flex-direction: column;
     max-width: 500px;
     width: 100%;
+    padding: 8px;
+    gap: 16px;
 }
 
 h2, h4 {
     text-align: center;
-    margin-top: 0;
+    margin: 0;
 
 }
 
 .file-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     padding: 16px;
     border-radius: 8px;
-    margin-bottom: 16px;
     background: var(--panel);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1)
 }
 
 .file-section h3 {
-    margin-top: 0;
-    margin-bottom: 12px;
+    margin: 0;
     font-size: 1.1em;
 }
 
 label {
     display: block;
-    margin-bottom: 4px;
     font-weight: bold;
     font-size: 0.9em;
 }
@@ -60,29 +98,22 @@ label {
 input[type="file"], select {
     width: 100%;
     padding: 8px;
-    margin-bottom: 12px;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
     background: inherit;
     color: inherit;
 }
 
-.merge-btn {
-    background-color: var(--merge-btn);
+#merge-btn {
+    background: var(--accent);
     color: white;
-    border: none;
-    padding: 12px;
     width: 100%;
-    font-size: 1.1em;
     font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
+    padding: 12px;
 }
 
 #status {
-    margin-top: 16px;
     padding: 8px;
     border-radius: 8px;
     text-align: center;
@@ -92,3 +123,34 @@ input[type="file"], select {
 
 .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+dialog {
+    width: min(80vw, 320px);
+    max-height: 90vh;
+    background: var(--bg);
+    color: inherit;
+    border: none;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+dialog::backdrop {
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    word-break: break-word;
+    text-align: left;
+}
+
+dialog h3 {
+    margin: 0;
+    padding-bottom: 4px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}

@@ -10,9 +10,15 @@
 </head>
 
 <body>
+    <header>
+        <button onclick="aboutModal.showModal()">About</button>
+    </header>
+
     <div class="container">
         <h2>Mario & Luigi: Partners in Time Save Merger</h2>
         <h4>Created by OfficialJH</h4>
+
+        <button style="width:100%" onclick="convertModal.showModal()">Convert Save Format...</button>
 
         <!-- File 1 Input -->
         <div class="file-section">
@@ -49,9 +55,37 @@
             </select>
         </div>
 
-        <button class="merge-btn" id="merge-btn">Merge & Download</button>
+        <button id="merge-btn">Merge & Download</button>
         <div id="status"></div>
     </div>
+
+    <dialog id="convertModal">
+        <div class="modal-content">
+            <h3>Save Converter</h3>
+            <span>Upload your save file to convert it into another format (.sav ⬌ .dsv)</span>
+            <input type="file" id="fileConvert" accept=".sav,.dsv">
+            <button id="convert-btn">Convert</button><br>
+            <button onclick="convertModal.close()" autofocus>Close</button>
+        </div>
+    </dialog>
+
+    <dialog id="aboutModal">
+        <div class="modal-content">
+            <h3>About</h3>
+
+            <span>A save file converter & merger for Mario & Luigi: Partners in Time.</span><br>
+
+            <span>2026 OfficialJH</span>
+
+            <span>
+                <a href="https://www.officialjh.com/" target="_blank">Main Website</a>
+                |
+                <a href="https://github.com/OfficialJH/pit-save-merger" target="_blank">Source Code</a>
+            </span>
+
+            <button onclick="aboutModal.close()" autofocus>Close</button>
+        </div>
+    </dialog>
 
     <script src="script.js"></script>
 </body>

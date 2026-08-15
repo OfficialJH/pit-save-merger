@@ -123,3 +123,54 @@ document.getElementById('merge-btn').addEventListener('click', async () => {
         console.error(error);
     }
 });
+
+
+// File Converter Logic
+document.getElementById('convert-btn').addEventListener('click', async () => {
+    const convertInput = document.getElementById('fileConvert');
+    
+    if (!convertInput.files[0]) {
+        alert("Please select a file to convert.");
+        return;
+    }
+
+    const file = convertInput.files[0];
+
+    try {
+        const inputData = await readFile(convertInput);
+
+        if (!inputData || inputData.length < FILE_SIZE) {
+            alert("Error: File is too small to be a valid save.");
+            return;
+        }
+
+        let outputData;
+        let outputFilename;
+        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+
+        // If file > 8192 bytes, it has a .dsv footer -> Strip footer to output .sav
+        if (inputData.length > FILE_SIZE) {
+            outputData = inputData.subarray(0, FILE_SIZE);
+            outputFilename = `${baseName}.sav`;
+            
+            // Cache footer in case user wants to export back to dsv later
+            dsvFooter = inputData.subarray(FILE_SIZE); 
+        } 
+        // If file == 8192 bytes, it's a raw .sav -> Append footer (or convert) to output .dsv
+        else {
+            const footer = dsvFooter || new TextEncoder().encode("|<-DeSmuME Save State Format->|");
+            outputData = new Uint8Array(FILE_SIZE + footer.length);
+            outputData.set(inputData, 0);
+            outputData.set(footer, FILE_SIZE);
+            outputFilename = `${baseName}.dsv`;
+        }
+
+        downloadFile(outputData, outputFilename);
+        document.getElementById('convertModal').close();
+        convertInput.value = '';
+
+    } catch (error) {
+        alert('Conversion failed: ${error}');
+        console.error(error);
+    }
+});
