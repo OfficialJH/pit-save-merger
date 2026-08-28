@@ -50,6 +50,30 @@ function downloadFile(dataArray, filename) {
     URL.revokeObjectURL(url);
 }
 
+// Helper to parse dropdown values into source file data and slot number
+function parseSlotSelection(value) {
+    const file = value.startsWith('f1') ? file1Data : file2Data;
+    const slot = value.endsWith('s1') ? 1 : 2;
+    return { file, slot };
+}
+
+// Copies primary and backup sector data from any source slot into a target slot
+function copySlotData(sourceData, sourceSlot, targetSlot, mergedData) {
+    const srcP = sourceSlot === 1 ? SECTORS.slot1_P : SECTORS.slot2_P;
+    const srcB = sourceSlot === 1 ? SECTORS.slot1_B : SECTORS.slot2_B;
+
+    const tgtP = targetSlot === 1 ? SECTORS.slot1_P : SECTORS.slot2_P;
+    const tgtB = targetSlot === 1 ? SECTORS.slot1_B : SECTORS.slot2_B;
+
+    // Copy Primary Sector
+    const pData = sourceData.subarray(srcP.start, srcP.end);
+    mergedData.set(pData.subarray(0, Math.min(pData.length, tgtP.end - tgtP.start)), tgtP.start);
+
+    // Copy Backup Sector
+    const bData = sourceData.subarray(srcB.start, srcB.end);
+    mergedData.set(bData.subarray(0, Math.min(bData.length, tgtB.end - tgtB.start)), tgtB.start);
+}
+
 // Main Merge Logic
 document.getElementById('merge-btn').addEventListener('click', async () => {
     const file1Input = document.getElementById('file1');
@@ -83,17 +107,13 @@ document.getElementById('merge-btn').addEventListener('click', async () => {
         // Keep File 1's header as the master global header
         mergedData.set(file1Data.subarray(SECTORS.header.start, SECTORS.header.end), SECTORS.header.start);
 
-        // Process Slot 1 (Primary & Backup)
-        const slot1Choice = document.getElementById('slot1-source').value;
-        const source1 = slot1Choice === "1" ? file1Data : file2Data;
-        mergedData.set(source1.subarray(SECTORS.slot1_P.start, SECTORS.slot1_P.end), SECTORS.slot1_P.start);
-        mergedData.set(source1.subarray(SECTORS.slot1_B.start, SECTORS.slot1_B.end), SECTORS.slot1_B.start);
+        // Process Slot 1
+        const slot1Selection = parseSlotSelection(document.getElementById('slot1-source').value);
+        copySlotData(slot1Selection.file, slot1Selection.slot, 1, mergedData);
 
-        // Process Slot 2 (Primary & Backup)
-        const slot2Choice = document.getElementById('slot2-source').value;
-        const source2 = slot2Choice === "1" ? file1Data : file2Data;
-        mergedData.set(source2.subarray(SECTORS.slot2_P.start, SECTORS.slot2_P.end), SECTORS.slot2_P.start);
-        mergedData.set(source2.subarray(SECTORS.slot2_B.start, SECTORS.slot2_B.end), SECTORS.slot2_B.start);
+        // Process Slot 2
+        const slot2Selection = parseSlotSelection(document.getElementById('slot2-source').value);
+        copySlotData(slot2Selection.file, slot2Selection.slot, 2, mergedData);
 
         // Handle Export Formatting
         const exportFormat = document.getElementById('export-format').value;
